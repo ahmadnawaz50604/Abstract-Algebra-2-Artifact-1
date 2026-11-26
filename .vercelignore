@@ -1,0 +1,5 @@
+node_modules
+.data
+.aistudio
+public/assets/aistudio
+dist

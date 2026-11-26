@@ -1,0 +1,8 @@
+{
+  "name": "AlgebraLab — Interactive Abstract Algebra Learning Platform",
+  "description": "University-level interactive abstract algebra learning platform covering Finite Abelian Groups, Permutation Groups, Dihedral Groups, and Cyclic Group Generators (Artifact 1).",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
