@@ -430,6 +430,22 @@ export function createApiApp(): express.Express {
     res.json({ ok: true });
   });
 
+  // Direct download of self-contained standalone Artifact 1 HTML
+  app.get('/api/export/html', (_req, res) => {
+    const candidates = [
+      path.resolve(process.cwd(), 'public', 'algebralab-artifact1.html'),
+      path.resolve(process.cwd(), 'dist', 'algebralab-artifact1.html'),
+    ];
+    const target = candidates.find((p) => fs.existsSync(p));
+    if (!target) {
+      res.redirect('/algebralab-artifact1.html');
+      return;
+    }
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="AlgebraLab-Artifact1.html"');
+    res.sendFile(target);
+  });
+
   // Auth routes
   app.post('/api/auth/register', (req, res) => {
     const { email, password, name } = req.body as {

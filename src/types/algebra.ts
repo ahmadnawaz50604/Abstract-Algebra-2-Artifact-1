@@ -207,6 +207,7 @@ export type NavSectionId =
   | 'cyclic'
   | 'classifier'
   | 'cayley'
+  | 'demolab'
   | 'assessment'
   | 'mockexam'
   | 'revision'

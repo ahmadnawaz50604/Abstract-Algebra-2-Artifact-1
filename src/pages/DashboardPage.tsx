@@ -195,8 +195,14 @@ export const DashboardPage: React.FC = () => {
             {
               nav: 'cayley' as const,
               icon: FileSpreadsheet,
-              title: 'Cayley Table Generator',
-              desc: 'Build interactive tables for ℤₙ, direct products, S₃/S₄, A₄, and Dₙ with CSV export & axiom checks.',
+              title: 'Cayley Table Generator & Axiom Auditor',
+              desc: 'Generate dynamic tables for arbitrary ℤₙ or Custom Finite Sets, audit all group axioms, and inspect cells.',
+            },
+            {
+              nav: 'demolab' as const,
+              icon: Sparkles,
+              title: 'Interactive Demonstration Lab (A–E)',
+              desc: 'Explore cyclic orbits, Euler totient circles, permutation composition, inversion parity crossings, and Dₙ polygons.',
             },
             {
               nav: 'mockexam' as const,

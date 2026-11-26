@@ -4,6 +4,7 @@ import {
   Calculator,
   CheckSquare,
   Compass,
+  Download,
   FileCheck2,
   FileSpreadsheet,
   GitBranch,
@@ -50,6 +51,7 @@ export const NAV_ITEMS: NavItemConfig[] = [
   { id: 'cyclic', label: 'Cyclic Group & Generator Calculator', group: 'Computational Labs', icon: Calculator },
   { id: 'classifier', label: 'Finite Abelian Group Classifier', group: 'Computational Labs', icon: Layers },
   { id: 'cayley', label: 'Cayley Table Generator', group: 'Computational Labs', icon: FileSpreadsheet },
+  { id: 'demolab', label: 'Interactive Demo Lab', group: 'Computational Labs', icon: Sparkles },
   { id: 'assessment', label: 'Self-Assessment', group: 'Practice & Assessment', icon: CheckSquare },
   { id: 'mockexam', label: 'Mock Examination', group: 'Practice & Assessment', icon: FileCheck2 },
   { id: 'revision', label: 'Personal Revision Centre', group: 'Practice & Assessment', icon: Target },
@@ -416,6 +418,19 @@ export const LayoutShell: React.FC<{ children: React.ReactNode }> = ({ children 
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
+            {typeof window !== 'undefined' && window.location.protocol !== 'file:' && (
+              <a
+                href="/api/export/html"
+                download="AlgebraLab-Artifact1.html"
+                title="Download standalone HTML file (AlgebraLab-Artifact1.html)"
+                className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 whitespace-nowrap shrink-0"
+                aria-label="Download standalone HTML"
+              >
+                <Download className="w-4 h-4 text-[#0B1F3A] dark:text-teal-400" />
+                <span className="hidden md:inline">Download HTML</span>
+              </a>
+            )}
+
             <button
               type="button"
               onClick={() => setSearchOpen(true)}

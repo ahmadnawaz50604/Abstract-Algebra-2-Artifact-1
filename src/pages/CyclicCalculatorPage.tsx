@@ -14,6 +14,7 @@ export const CyclicCalculatorPage: React.FC = () => {
   const [n, setN] = useState(12);
   const [elementA, setElementA] = useState(5);
   const [tableFilter, setTableFilter] = useState<'all' | '1to20' | 'primes'>('1to20');
+  const [trailSteps, setTrailSteps] = useState(1);
 
   const safeN = Math.max(1, Math.min(200, Math.trunc(n) || 1));
   const safeA = ((elementA % safeN) + safeN) % safeN;
@@ -159,9 +160,65 @@ export const CyclicCalculatorPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="text-xs font-mono-math text-slate-700 dark:text-slate-300">
-            ⟨{safeA}⟩ = {'{'}{detail.subgroup.slice(0, 40).join(', ')}
-            {detail.subgroup.length > 40 ? ', …' : ''}{'}'}
+          <div className="p-3.5 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-2.5 text-xs">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="font-semibold text-slate-600 dark:text-slate-300">
+                Interactive Subgroup Trail ⟨{safeA}⟩ in ⟨ℤ_{safeN}, +_{safeN}⟩
+              </span>
+              <div className="flex gap-1.5">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setTrailSteps((s) => Math.min(detail.elementOrder, s + 1))
+                  }
+                  disabled={trailSteps >= detail.elementOrder}
+                  className="px-2.5 py-1 rounded bg-teal-600 text-white font-semibold disabled:opacity-40"
+                >
+                  + Step ({safeA})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTrailSteps(detail.elementOrder)}
+                  className="px-2.5 py-1 rounded border border-slate-200 dark:border-slate-700 font-semibold"
+                >
+                  Show Full ⟨{safeA}⟩
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTrailSteps(1)}
+                  className="px-2.5 py-1 rounded border border-slate-200 dark:border-slate-700 font-semibold"
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-1.5 font-mono-math">
+              {Array.from(
+                { length: Math.min(detail.elementOrder, Math.max(1, trailSteps)) },
+                (_, idx) => {
+                  const k = idx + 1;
+                  const val = (k * safeA) % safeN;
+                  return (
+                    <span
+                      key={k}
+                      className={`px-2 py-1 rounded border ${
+                        val === 0
+                          ? 'bg-teal-600 text-white border-teal-600 font-bold'
+                          : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700'
+                      }`}
+                    >
+                      {k}·{safeA} ≡ {val}
+                    </span>
+                  );
+                }
+              )}
+            </div>
+
+            <div className="font-mono-math text-slate-700 dark:text-slate-300">
+              ⟨{safeA}⟩ = {'{'}{detail.subgroup.slice(0, 40).join(', ')}
+              {detail.subgroup.length > 40 ? ', …' : ''}{'}'} (|⟨{safeA}⟩| = {detail.elementOrder})
+            </div>
           </div>
 
           {detail.allElements.length > 0 && (

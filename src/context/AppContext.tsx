@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import type { CayleyGroupKind } from '../math/cayley.ts';
 import { api } from '../services/api.ts';
 import type {
   AssignmentRecord,
@@ -30,6 +31,9 @@ interface AppContextValue {
   setQuizTargetSubsectionId: (id: string) => void;
   openLearnSubsection: (subsectionId: string) => void;
   openQuizForSubsection: (subsectionId: string) => void;
+  cayleySpec: CayleyGroupKind;
+  setCayleySpec: (spec: CayleyGroupKind) => void;
+  openCayleyForSpec: (spec: CayleyGroupKind) => void;
   authModalOpen: boolean;
   setAuthModalOpen: (open: boolean) => void;
 
@@ -104,6 +108,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [activeNav, setActiveNav] = useState<NavSectionId>('dashboard');
   const [selectedSubsectionId, setSelectedSubsectionId] = useState('m1-s1');
   const [quizTargetSubsectionId, setQuizTargetSubsectionId] = useState('m1-s1');
+  const [cayleySpec, setCayleySpec] = useState<CayleyGroupKind>({ type: 'cyclic', n: 6 });
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [tutorOpen, setTutorOpen] = useState(false);
   const [tutorRequest, setTutorRequest] = useState<{
@@ -554,6 +559,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setQuizTargetSubsectionId,
         openLearnSubsection,
         openQuizForSubsection,
+        cayleySpec,
+        setCayleySpec,
+        openCayleyForSpec: (spec: CayleyGroupKind) => {
+          setCayleySpec(spec);
+          setActiveNav('cayley');
+        },
         authModalOpen,
         setAuthModalOpen,
         tutorOpen,

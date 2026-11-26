@@ -1,17 +1,29 @@
-import { CheckCircle2, Play, XCircle } from 'lucide-react';
+import { CheckCircle2, Download, Play, XCircle } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { runMathValidationSuite } from '../math/validation.ts';
 
 export const HelpAboutPage: React.FC = () => {
   const [results, setResults] = useState(() => runMathValidationSuite());
   const allPass = useMemo(() => results.every((r) => r.passed), [results]);
+  const isFileProtocol = typeof window !== 'undefined' && window.location.protocol === 'file:';
 
   return (
     <div className="space-y-6">
       <section className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0D1A2D] p-6 space-y-3">
-        <h2 className="text-xl font-bold font-serif-math">
-          About AlgebraLab — Artifact 1 Platform &amp; Notation Guide
-        </h2>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <h2 className="text-xl font-bold font-serif-math">
+            About AlgebraLab — Artifact 1 Platform &amp; Notation Guide
+          </h2>
+          {!isFileProtocol && (
+            <a
+              href="/api/export/html"
+              download="AlgebraLab-Artifact1.html"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#0B1F3A] text-white dark:bg-teal-600 text-xs font-semibold hover:opacity-95"
+            >
+              <Download className="w-3.5 h-3.5" /> Download Standalone HTML
+            </a>
+          )}
+        </div>
         <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
           AlgebraLab is a dedicated university-level interactive learning platform for Algebra II Artifact 1, featuring computational laboratories, interactive lessons, timed Mock Examinations, a Personal Revision Centre, and an optional AI Mathematics Tutor.
         </p>

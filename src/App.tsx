@@ -13,6 +13,7 @@ import { ExerciseCentrePage } from './pages/ExerciseCentrePage.tsx';
 import { FiniteAbelianPage } from './pages/FiniteAbelianPage.tsx';
 import { GroupExplorerPage } from './pages/GroupExplorerPage.tsx';
 import { HelpAboutPage } from './pages/HelpAboutPage.tsx';
+import { InteractiveDemoLabPage } from './pages/InteractiveDemoLabPage.tsx';
 import { LearnPage } from './pages/LearnPage.tsx';
 import { MockExamPage } from './pages/MockExamPage.tsx';
 import { PermutationLabPage } from './pages/PermutationLabPage.tsx';
@@ -44,6 +45,8 @@ const PageRouter: React.FC = () => {
       return <AbelianClassifierPage />;
     case 'cayley':
       return <CayleyTablePage />;
+    case 'demolab':
+      return <InteractiveDemoLabPage />;
     case 'assessment':
       return <SelfAssessmentPage />;
     case 'mockexam':

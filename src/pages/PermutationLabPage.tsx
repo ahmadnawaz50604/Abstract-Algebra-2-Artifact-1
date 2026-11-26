@@ -21,6 +21,7 @@ export const PermutationLabPage: React.FC = () => {
   const [sigmaTwoRow, setSigmaTwoRow] = useState('2 3 1 5 4');
   const [tauTwoRow, setTauTwoRow] = useState('4 3 2 1 5');
   const [explorerFilter, setExplorerFilter] = useState<'all' | 'even' | 'odd'>('all');
+  const [selectedTraceX, setSelectedTraceX] = useState<number>(1);
 
   const parsed = useMemo(() => {
     try {
@@ -58,27 +59,38 @@ export const PermutationLabPage: React.FC = () => {
   const snSummary = useMemo(() => (n <= 5 ? summarizeSn(n) : null), [n]);
 
   const changeDegree = (nextN: number) => {
-    setN(nextN);
-    if (nextN === 2) {
+    const safeN = Math.max(2, Math.min(12, Math.trunc(nextN) || 2));
+    setN(safeN);
+    setSelectedTraceX(1);
+    if (safeN === 2) {
       setSigmaCycle('(1 2)');
-      setTauCycle('(1)');
+      setTauCycle('ι');
       setSigmaTwoRow('2 1');
       setTauTwoRow('1 2');
-    } else if (nextN === 3) {
+    } else if (safeN === 3) {
       setSigmaCycle('(1 2)');
       setTauCycle('(1 3)');
       setSigmaTwoRow('2 1 3');
       setTauTwoRow('3 2 1');
-    } else if (nextN === 4) {
+    } else if (safeN === 4) {
       setSigmaCycle('(1 3 2)');
       setTauCycle('(2 4)');
       setSigmaTwoRow('3 1 2 4');
       setTauTwoRow('1 4 3 2');
-    } else {
+    } else if (safeN === 5) {
       setSigmaCycle('(1 2 3)(4 5)');
       setTauCycle('(1 4)(2 3)');
       setSigmaTwoRow('2 3 1 5 4');
       setTauTwoRow('4 3 2 1 5');
+    } else {
+      const shifted = Array.from({ length: safeN }, (_, i) => ((i + 1) % safeN) + 1);
+      const swapped = Array.from({ length: safeN }, (_, i) =>
+        i === 0 ? 2 : i === 1 ? 1 : i + 1
+      );
+      setSigmaCycle(`(1 2 3)(4 ${safeN})`);
+      setTauCycle(`(1 ${safeN})(2 3)`);
+      setSigmaTwoRow(shifted.join(' '));
+      setTauTwoRow(swapped.join(' '));
     }
   };
 
@@ -123,7 +135,7 @@ export const PermutationLabPage: React.FC = () => {
               Right-to-left composition <span className="font-mono-math">(στ)(x) = σ(τ(x))</span>, disjoint cycle decomposition, transposition factorization, and parity.
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {[2, 3, 4, 5].map((deg) => (
               <button
                 key={deg}
@@ -138,6 +150,17 @@ export const PermutationLabPage: React.FC = () => {
                 S_{deg}
               </button>
             ))}
+            <label className="flex items-center gap-1.5 text-xs ml-1">
+              <span className="font-semibold">Custom n (2–12):</span>
+              <input
+                type="number"
+                min={2}
+                max={12}
+                value={n}
+                onChange={(e) => changeDegree(Number(e.target.value))}
+                className="w-16 px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-mono-math font-bold"
+              />
+            </label>
           </div>
         </div>
 
@@ -245,23 +268,48 @@ export const PermutationLabPage: React.FC = () => {
               {renderPermCard('Reverse Product τσ (apply σ first, then τ)', parsed.prodTS)}
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-3">
               <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                Element-by-Element Trace for στ
+                Interactive Element-by-Element Trace for (στ)(x) = σ(τ(x)) — Click any x
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                {parsed.stepsST.map((st) => (
-                  <div
-                    key={st.element}
-                    className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-mono-math text-center"
-                  >
-                    {st.element} → {st.afterRight} →{' '}
-                    <span className="font-bold text-teal-700 dark:text-teal-400">
-                      {st.afterLeft}
-                    </span>
-                  </div>
-                ))}
+                {parsed.stepsST.map((st) => {
+                  const active = selectedTraceX === st.element;
+                  return (
+                    <button
+                      key={st.element}
+                      type="button"
+                      onClick={() => setSelectedTraceX(st.element)}
+                      className={`p-2.5 rounded-lg border text-xs font-mono-math text-center transition-colors ${
+                        active
+                          ? 'border-teal-600 bg-teal-50 dark:bg-teal-950/50'
+                          : 'border-slate-200 dark:border-slate-700 hover:border-teal-500'
+                      }`}
+                    >
+                      {st.element} → {st.afterRight} →{' '}
+                      <span className="font-bold text-teal-700 dark:text-teal-400">
+                        {st.afterLeft}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
+              {(() => {
+                const chosen =
+                  parsed.stepsST.find((s) => s.element === selectedTraceX) ?? parsed.stepsST[0];
+                if (!chosen) return null;
+                return (
+                  <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-xs font-mono-math">
+                    Step-by-step for x = {chosen.element}: apply right factor τ({chosen.element}) ={' '}
+                    <span className="font-bold">{chosen.afterRight}</span>, then apply left factor σ(
+                    {chosen.afterRight}) ={' '}
+                    <span className="font-bold text-teal-700 dark:text-teal-400">
+                      {chosen.afterLeft}
+                    </span>{' '}
+                    ⇒ (στ)({chosen.element}) = {chosen.afterLeft}.
+                  </div>
+                );
+              })()}
             </div>
           </section>
         </>

@@ -9,7 +9,7 @@ import { formatCycleNotation, permOrder, summarizeSn } from '../math/permutation
 type ExplorerFamily = 'cyclic' | 'direct' | 'dihedral' | 'symmetric' | 'alternating';
 
 export const GroupExplorerPage: React.FC = () => {
-  const { setActiveNav } = useApp();
+  const { openCayleyForSpec } = useApp();
   const [family, setFamily] = useState<ExplorerFamily>('dihedral');
   const [nParam, setNParam] = useState(4);
   const [dpModuli, setDpModuli] = useState<[number, number]>([2, 6]);
@@ -110,7 +110,24 @@ export const GroupExplorerPage: React.FC = () => {
           </div>
           <button
             type="button"
-            onClick={() => setActiveNav('cayley')}
+            onClick={() => {
+              if (family === 'cyclic') {
+                openCayleyForSpec({ type: 'cyclic', n: Math.min(24, Math.max(1, nParam)) });
+              } else if (family === 'dihedral') {
+                openCayleyForSpec({ type: 'dihedral', n: Math.min(12, Math.max(3, nParam)) });
+              } else if (family === 'direct') {
+                const [a, b] = dpModuli;
+                if (a * b <= 24) {
+                  openCayleyForSpec({ type: 'direct_product', moduli: [a, b] });
+                } else {
+                  openCayleyForSpec({ type: 'direct_product', moduli: [2, 4] });
+                }
+              } else if (family === 'symmetric') {
+                openCayleyForSpec({ type: 'symmetric', n: Math.min(4, Math.max(2, nParam)) });
+              } else {
+                openCayleyForSpec({ type: 'alternating', n: Math.min(4, Math.max(3, nParam)) });
+              }
+            }}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-teal-600 text-white text-xs font-semibold whitespace-nowrap self-start"
           >
             <span>Open in Cayley Table</span>
@@ -173,13 +190,29 @@ export const GroupExplorerPage: React.FC = () => {
             </label>
           </div>
         ) : (
-          <div className="flex items-center gap-4 text-xs">
-            <span className="font-semibold">Parameter n = {nParam}</span>
+          <div className="flex flex-wrap items-center gap-4 text-xs">
+            <label className="flex items-center gap-2 font-semibold">
+              <span>Assign n:</span>
+              <input
+                type="number"
+                min={family === 'dihedral' ? 3 : family === 'cyclic' ? 1 : family === 'alternating' ? 3 : 2}
+                max={family === 'symmetric' || family === 'alternating' ? 5 : family === 'dihedral' ? 24 : 60}
+                value={nParam}
+                onChange={(e) => {
+                  const raw = Math.trunc(Number(e.target.value));
+                  if (Number.isNaN(raw)) return;
+                  const minV = family === 'dihedral' ? 3 : family === 'cyclic' ? 1 : family === 'alternating' ? 3 : 2;
+                  const maxV = family === 'symmetric' || family === 'alternating' ? 5 : family === 'dihedral' ? 24 : 60;
+                  setNParam(Math.max(minV, Math.min(maxV, raw)));
+                }}
+                className="w-20 px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-mono-math font-bold"
+              />
+            </label>
             <input
               type="range"
-              min={family === 'dihedral' ? 3 : 2}
+              min={family === 'dihedral' ? 3 : family === 'cyclic' ? 1 : family === 'alternating' ? 3 : 2}
               max={family === 'symmetric' || family === 'alternating' ? 5 : 24}
-              value={nParam}
+              value={Math.min(family === 'symmetric' || family === 'alternating' ? 5 : 24, nParam)}
               onChange={(e) => setNParam(Number(e.target.value))}
               className="w-56 accent-teal-600"
             />

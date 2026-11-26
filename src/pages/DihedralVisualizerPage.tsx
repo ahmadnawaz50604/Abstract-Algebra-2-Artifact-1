@@ -90,21 +90,34 @@ export const DihedralVisualizerPage: React.FC = () => {
 
         <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600 dark:text-slate-300">
           <label className="flex items-center gap-2">
-            <span className="font-semibold">Custom n (3..16):</span>
+            <span className="font-semibold">Assign n (3..24):</span>
             <input
-              type="range"
+              type="number"
               min={3}
-              max={16}
+              max={24}
               value={n}
               onChange={(e) => {
-                const val = Number(e.target.value);
+                const raw = Math.trunc(Number(e.target.value));
+                if (Number.isNaN(raw)) return;
+                const val = Math.max(3, Math.min(24, raw));
                 setN(val);
                 setSelectedK((k) => k % val);
               }}
-              className="w-40 accent-teal-600"
+              className="w-16 px-2 py-1 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-mono-math font-bold text-slate-900 dark:text-white"
             />
-            <span className="font-mono-math font-bold">{n}</span>
           </label>
+          <input
+            type="range"
+            min={3}
+            max={16}
+            value={Math.min(16, n)}
+            onChange={(e) => {
+              const val = Number(e.target.value);
+              setN(val);
+              setSelectedK((k) => k % val);
+            }}
+            className="w-36 accent-teal-600"
+          />
           <div>
             Center Z(D_{n}) ={' '}
             <span className="font-mono-math font-semibold">
@@ -265,21 +278,46 @@ export const DihedralVisualizerPage: React.FC = () => {
               productData.result &&
               productData.rev && (
                 <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
-                  <div className="text-sm font-bold font-mono-math">
-                    ({formatDihedral(productData.left!, '1')})({formatDihedral(productData.right!, '1')}) ={' '}
-                    <span className="text-teal-700 dark:text-teal-400">
-                      {formatDihedral(productData.result, '1')}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedRef(productData.result!.ref);
-                        setSelectedK(productData.result!.k);
-                      }}
-                      className="ml-3 text-xs underline font-sans font-semibold text-[#0B1F3A] dark:text-slate-200"
-                    >
-                      Show on polygon
-                    </button>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="text-sm font-bold font-mono-math">
+                      ({formatDihedral(productData.left!, '1')})({formatDihedral(productData.right!, '1')}) ={' '}
+                      <span className="text-teal-700 dark:text-teal-400">
+                        {formatDihedral(productData.result, '1')}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5 font-sans">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedRef(0);
+                          setSelectedK(0);
+                        }}
+                        className="px-2 py-1 rounded border border-slate-200 dark:border-slate-700 text-[11px] font-semibold hover:border-teal-500"
+                      >
+                        Step 0: Start (1)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedRef(productData.right!.ref);
+                          setSelectedK(productData.right!.k);
+                        }}
+                        className="px-2 py-1 rounded border border-slate-200 dark:border-slate-700 text-[11px] font-semibold hover:border-teal-500"
+                      >
+                        Step 1: Apply {formatDihedral(productData.right!, '1')}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedRef(productData.result!.ref);
+                          setSelectedK(productData.result!.k);
+                        }}
+                        className="px-2 py-1 rounded bg-[#0B1F3A] dark:bg-teal-600 text-white text-[11px] font-semibold"
+                      >
+                        Step 2: Apply {formatDihedral(productData.left!, '1')} →{' '}
+                        {formatDihedral(productData.result, '1')}
+                      </button>
+                    </div>
                   </div>
                   <ol className="list-decimal pl-4 space-y-1 text-slate-700 dark:text-slate-300">
                     {productData.steps.map((s, idx) => (

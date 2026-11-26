@@ -146,6 +146,35 @@ export function permSign(p: Permutation): 1 | -1 {
   return permParity(p) === 'even' ? 1 : -1;
 }
 
+export interface PermutationInversion {
+  i: number;
+  j: number;
+  valI: number;
+  valJ: number;
+}
+
+export function computePermutationInversions(p: Permutation): {
+  inversions: PermutationInversion[];
+  count: number;
+  sign: 1 | -1;
+  parity: 'even' | 'odd';
+} {
+  const inversions: PermutationInversion[] = [];
+  for (let i = 1; i <= p.n; i++) {
+    const valI = p.mapping[i - 1];
+    for (let j = i + 1; j <= p.n; j++) {
+      const valJ = p.mapping[j - 1];
+      if (valI > valJ) {
+        inversions.push({ i, j, valI, valJ });
+      }
+    }
+  }
+  const count = inversions.length;
+  const parity: 'even' | 'odd' = count % 2 === 0 ? 'even' : 'odd';
+  const sign: 1 | -1 = parity === 'even' ? 1 : -1;
+  return { inversions, count, sign, parity };
+}
+
 export function cycleType(p: Permutation): number[] {
   const { cycles, fixedPoints } = toDisjointCycles(p);
   return [...cycles.map((c) => c.length), ...fixedPoints.map(() => 1)].sort((a, b) => b - a);
